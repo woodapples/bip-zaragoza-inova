@@ -1,0 +1,65 @@
+<div class="login-screen">
+  <div class="login-content">
+    <div class="login-header">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#00e5ff" />
+      </svg>
+      <h1 class="login-title">INOVAPP</h1>
+      <p class="login-subtitle">Select your profile to continue</p>
+    </div>
+
+    <div class="persona-cards">
+      @for (persona of personas; track persona.id) {
+        <div
+          class="persona-login-card glass-panel"
+          [class.selected]="selectedPersona?.id === persona.id"
+          (click)="selectPersona(persona)"
+        >
+          <div
+            class="persona-avatar-large"
+            [style.background]="
+              persona.id === 'martin'
+                ? 'linear-gradient(135deg, #2979ff, #00e5ff)'
+                : 'linear-gradient(135deg, #7c4dff, #00e5ff)'
+            "
+          >
+            {{ persona.avatar }}
+          </div>
+          <h2 class="persona-card-name">{{ persona.name }}</h2>
+          <span class="persona-card-archetype">"{{ persona.archetype }}"</span>
+          <ul class="persona-card-details">
+            <li>{{ persona.age }}</li>
+            <li>{{ persona.occupation }}</li>
+            <li>{{ persona.location }}</li>
+            <li>{{ persona.detail }}</li>
+          </ul>
+          <div class="persona-card-bio-preview">
+            {{ persona.bio | slice: 0 : 80 }}...
+          </div>
+
+          @if (selectedPersona?.id === persona.id) {
+            <div class="selected-indicator">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#00e5ff">
+                <path
+                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                />
+              </svg>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <button
+      class="login-btn btn-primary"
+      [class.disabled]="!selectedPersona"
+      (click)="login()"
+    >
+      @if (selectedPersona) {
+        Continue as {{ selectedPersona.name }}
+      } @else {
+        Select a profile
+      }
+    </button>
+  </div>
+</div>

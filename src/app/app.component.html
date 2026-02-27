@@ -1,0 +1,13 @@
+<div class="app-shell" [class.full-screen]="!showShell">
+  @if (showShell) {
+    <app-topbar></app-topbar>
+  }
+  <div class="app-body">
+    @if (showShell) {
+      <app-sidebar></app-sidebar>
+    }
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

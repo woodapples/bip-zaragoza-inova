@@ -1,0 +1,379 @@
+<div class="chrono-page">
+  <div class="page-header">
+    <h1 class="page-title">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#00e5ff"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 6v6l4 2" stroke-linecap="round" />
+      </svg>
+      Chrono Density & Stats
+    </h1>
+    <p class="page-subtitle">Real-time density analysis & commuter analytics</p>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="tab-bar">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'density'"
+      (click)="switchTab('density')"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <rect x="3" y="12" width="4" height="9" rx="1" />
+        <rect x="10" y="7" width="4" height="14" rx="1" />
+        <rect x="17" y="3" width="4" height="18" rx="1" />
+      </svg>
+      DENSITY
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'personas'"
+      (click)="switchTab('personas')"
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+      </svg>
+      PERSONAS
+    </button>
+  </div>
+
+  <!-- DENSITY TAB -->
+  @if (activeTab === "density") {
+    <div class="line-selector">
+      @for (line of lines; track line.name) {
+        <button
+          class="line-btn"
+          [class.active]="selectedLine === line.name"
+          [style.--line-color]="line.color"
+          (click)="selectLine(line.name)"
+        >
+          {{ line.name }}
+        </button>
+      }
+    </div>
+
+    <div class="time-range-selector">
+      @for (range of timeRanges; track range.id) {
+        <button
+          class="range-btn"
+          [class.active]="selectedTimeRange === range.id"
+          [class.peak]="range.peak"
+          (click)="selectTimeRange(range.id)"
+        >
+          <span class="range-label">{{ range.label }}</span>
+          @if (range.peak) {
+            <span class="peak-badge">PEAK</span>
+          }
+        </button>
+      }
+    </div>
+
+    <div class="chrono-grid">
+      <div class="chart-card glass-panel">
+        <h3 class="card-title">Hourly Density — {{ selectedLine }}</h3>
+        <div class="bar-chart">
+          @for (item of hourlyData; track item.hour) {
+            <div class="bar-col">
+              <div class="bar-value">{{ item.density }}%</div>
+              <div class="bar-wrap">
+                <div
+                  class="bar-fill"
+                  [style.height.%]="item.density"
+                  [style.background]="getDensityColor(item.density)"
+                ></div>
+              </div>
+              <div class="bar-label">{{ item.hour }}</div>
+            </div>
+          }
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item"
+            ><span class="legend-dot" style="background: #66bb6a"></span> Low
+            (&lt;50%)</span
+          >
+          <span class="legend-item"
+            ><span class="legend-dot" style="background: #00e5ff"></span> Medium
+            (50-70%)</span
+          >
+          <span class="legend-item"
+            ><span class="legend-dot" style="background: #ffa726"></span> High
+            (70-90%)</span
+          >
+          <span class="legend-item"
+            ><span class="legend-dot" style="background: #ff4757"></span>
+            Critical (&gt;90%)</span
+          >
+        </div>
+      </div>
+
+      <div class="stops-card glass-panel">
+        <h3 class="card-title">Density by Stop</h3>
+        <div class="stops-list">
+          @for (stop of stops; track stop.name) {
+            <div class="stop-row">
+              <div class="stop-info">
+                <span class="stop-name">{{ stop.name }}</span>
+                <span class="stop-passengers"
+                  >{{ stop.passengers }}/{{ stop.capacity }} passengers</span
+                >
+              </div>
+              <div class="stop-bar-wrap">
+                <div class="stop-bar">
+                  <div
+                    class="stop-bar-fill"
+                    [style.width.%]="stop.density"
+                    [style.background]="getDensityColor(stop.density)"
+                  ></div>
+                </div>
+                <span
+                  class="stop-density"
+                  [style.color]="getDensityColor(stop.density)"
+                  >{{ stop.density }}%</span
+                >
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="reco-card glass-panel">
+        <h3 class="card-title">Smart Recommendations</h3>
+        <div class="reco-list">
+          @for (reco of recommendations; track reco.time) {
+            <div class="reco-item" [class]="reco.type">
+              <div class="reco-time">{{ reco.time }}</div>
+              <div class="reco-msg">{{ reco.message }}</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="dispo-card glass-panel">
+        <h3 class="card-title">Disponibility Time Range</h3>
+        <div class="dispo-visual">
+          <div class="dispo-timeline">
+            @for (range of timeRanges; track range.id) {
+              <div class="dispo-block" [class.peak]="range.peak">
+                <div class="dispo-label">{{ range.label }}</div>
+                <div class="dispo-bar" [class.peak]="range.peak">
+                  @if (range.peak) {
+                    <div class="dispo-pulse"></div>
+                  }
+                </div>
+                <div class="dispo-status">
+                  {{ range.peak ? "High Demand" : "Available" }}
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- PERSONAS TAB -->
+  @if (activeTab === "personas") {
+    <div class="global-stats">
+      <div class="stat-card glass-panel">
+        <div class="stat-value glow-text">
+          {{ globalStats.totalUsers | number }}
+        </div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card glass-panel">
+        <div class="stat-value glow-text">
+          {{ globalStats.avgDailyTrips | number }}
+        </div>
+        <div class="stat-label">Daily Trips</div>
+      </div>
+      <div class="stat-card glass-panel">
+        <div class="stat-value glow-text">
+          {{ globalStats.avgSatisfaction }}
+        </div>
+        <div class="stat-label">Avg. Satisfaction</div>
+      </div>
+      <div class="stat-card glass-panel">
+        <div class="stat-value glow-text">{{ globalStats.co2SavedTotal }}t</div>
+        <div class="stat-label">CO₂ Saved</div>
+      </div>
+    </div>
+
+    <div class="search-section">
+      <div class="search-box glass-panel">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#8892b0"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" stroke-linecap="round" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search personas by name, type, or line..."
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+    </div>
+
+    <div class="persona-layout">
+      <div class="persona-list">
+        @for (persona of filteredPersonas; track persona.id) {
+          <div
+            class="persona-card glass-panel"
+            [class.selected]="selectedPersona?.id === persona.id"
+            (click)="selectPersona(persona)"
+          >
+            <div
+              class="persona-avatar"
+              [style.background]="'linear-gradient(135deg, #2979ff, #00e5ff)'"
+            >
+              {{ persona.avatar }}
+            </div>
+            <div class="persona-info">
+              <h4 class="persona-name">{{ persona.name }}</h4>
+              <span class="persona-type">{{ persona.type }}</span>
+            </div>
+            <div class="persona-quick">
+              <span class="quick-stat">{{ persona.avgTrips }} trips/mo</span>
+              <span class="quick-line">{{ persona.preferredLine }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (selectedPersona) {
+        <div class="persona-detail glass-panel">
+          <div class="detail-header">
+            <div
+              class="detail-avatar"
+              [style.background]="'linear-gradient(135deg, #2979ff, #00e5ff)'"
+            >
+              {{ selectedPersona.avatar }}
+            </div>
+            <div class="detail-info">
+              <h2 class="detail-name">{{ selectedPersona.name }}</h2>
+              <span class="detail-type">{{ selectedPersona.type }}</span>
+            </div>
+            <button class="close-btn" (click)="clearSelection()">✕</button>
+          </div>
+
+          <div class="detail-stats">
+            <div class="detail-stat">
+              <span class="ds-value">{{ selectedPersona.totalTrips }}</span>
+              <span class="ds-label">Total Trips</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-value">{{ selectedPersona.co2Saved }}kg</span>
+              <span class="ds-label">CO₂ Saved</span>
+            </div>
+            <div class="detail-stat">
+              <span class="ds-value">{{ selectedPersona.safetyScore }}</span>
+              <span class="ds-label">Safety Score</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Travel Pattern</h4>
+            <div class="detail-row">
+              <span class="dr-label">Peak Usage</span
+              ><span class="dr-value">{{ selectedPersona.peakUsage }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="dr-label">Preferred Line</span
+              ><span class="dr-value">{{ selectedPersona.preferredLine }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="dr-label">Pattern</span
+              ><span class="dr-value">{{ selectedPersona.travelPattern }}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Favorite Stops</h4>
+            <div class="fav-stops">
+              @for (stop of selectedPersona.favoriteStops; track stop) {
+                <span class="stop-tag">{{ stop }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Monthly Trips</h4>
+            <div class="mini-chart">
+              @for (stat of selectedPersona.monthlyStats; track stat.month) {
+                <div class="mini-col">
+                  <div class="mini-bar-wrap">
+                    <div
+                      class="mini-bar"
+                      [style.height.%]="
+                        (stat.trips / getMaxTrips(selectedPersona)) * 100
+                      "
+                    ></div>
+                  </div>
+                  <span class="mini-label">{{ stat.month }}</span>
+                  <span class="mini-value">{{ stat.trips }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Safety Rating</h4>
+            <div class="stars">
+              @for (
+                star of getStars(selectedPersona.safetyScore);
+                track $index
+              ) {
+                <span class="star" [class]="star">★</span>
+              }
+              <span class="rating-num"
+                >{{ selectedPersona.safetyScore }}/5</span
+              >
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="no-selection glass-panel">
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#2a3060"
+            stroke-width="1"
+          >
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+          <p>Select a persona to view detailed stats</p>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,61 @@
+<div class="splash-screen">
+  <div class="splash-bg">
+    <div class="grid-line h1"></div>
+    <div class="grid-line h2"></div>
+    <div class="grid-line h3"></div>
+    <div class="grid-line v1"></div>
+    <div class="grid-line v2"></div>
+    <div class="grid-line v3"></div>
+  </div>
+
+  <div class="splash-content">
+    <div class="logo-container">
+      <div class="logo-ring">
+        <svg viewBox="0 0 120 120" class="ring-svg">
+          <circle
+            cx="60"
+            cy="60"
+            r="54"
+            fill="none"
+            stroke="rgba(0,229,255,0.15)"
+            stroke-width="2"
+          />
+          <circle
+            cx="60"
+            cy="60"
+            r="54"
+            fill="none"
+            stroke="#00e5ff"
+            stroke-width="2"
+            stroke-dasharray="339.292"
+            [attr.stroke-dashoffset]="
+              339.292 - (339.292 * loadingProgress) / 100
+            "
+            stroke-linecap="round"
+            class="progress-ring"
+          />
+        </svg>
+        <div class="logo-inner">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#00e5ff" />
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="app-name">INOVAPP</h1>
+      <p class="app-tagline">Smart Mobility for Zaragoza</p>
+    </div>
+
+    <div class="loading-section">
+      <div class="loading-bar">
+        <div class="loading-fill" [style.width.%]="loadingProgress"></div>
+      </div>
+      <div class="loading-info">
+        <span class="loading-text">{{ loadingText }}</span>
+        <span class="loading-pct">{{ loadingProgress }}%</span>
+      </div>
+    </div>
+
+    <p class="splash-footer">Overcrowding ends here.</p>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<div class="settings-container">
+  @if (persona) {
+    <div class="settings-header">
+      <h2>USER PROFILE</h2>
+      <div class="header-actions">
+        <button class="switch-btn" (click)="switchPersona()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"
+            />
+          </svg>
+          Switch Persona
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"
+            />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-grid">
+      <!-- Profile Card -->
+      <div class="profile-card glass-panel">
+        <div class="profile-top">
+          <div
+            class="profile-avatar"
+            [style.background]="
+              persona.id === 'martin'
+                ? 'linear-gradient(135deg, #2979ff, #00e5ff)'
+                : 'linear-gradient(135deg, #7c4dff, #00e5ff)'
+            "
+          >
+            {{ persona.avatar }}
+          </div>
+          <div class="profile-info">
+            <h3 class="profile-name">{{ persona.name }}</h3>
+            <span class="profile-archetype">"{{ persona.archetype }}"</span>
+          </div>
+        </div>
+
+        <div class="profile-details">
+          <div class="detail-row">
+            <span class="detail-label">Age</span>
+            <span class="detail-value">{{ persona.age }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Occupation</span>
+            <span class="detail-value">{{ persona.occupation }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Location</span>
+            <span class="detail-value">{{ persona.location }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Detail</span>
+            <span class="detail-value">{{ persona.detail }}</span>
+          </div>
+        </div>
+
+        <div class="profile-bio">
+          <span class="bio-label">BIO</span>
+          <p>{{ persona.bio }}</p>
+        </div>
+      </div>
+
+      <!-- Personality Traits -->
+      <div class="traits-card glass-panel">
+        <h3 class="traits-title">PERSONALITY TRAITS</h3>
+        <div class="traits-list">
+          @for (trait of persona.personality; track trait.left) {
+            <div class="trait-row">
+              <div class="trait-labels">
+                <span class="trait-left" [class.active]="trait.value < 50">{{
+                  trait.left
+                }}</span>
+                <span class="trait-right" [class.active]="trait.value >= 50">{{
+                  trait.right
+                }}</span>
+              </div>
+              <div class="trait-slider">
+                <div class="trait-track">
+                  <div class="trait-fill" [style.width.%]="trait.value"></div>
+                  <div class="trait-thumb" [style.left.%]="trait.value"></div>
+                </div>
+              </div>
+              <span class="trait-value">{{ trait.value }}%</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="preferences-section glass-panel">
+      <h3 class="prefs-title">TRANSPORT PREFERENCES</h3>
+      <div class="pref-grid">
+        <div class="pref-item">
+          <div class="pref-icon">🚌</div>
+          <span>Bus</span>
+          <div class="pref-toggle active"></div>
+        </div>
+        <div class="pref-item">
+          <div class="pref-icon">🚊</div>
+          <span>Tram</span>
+          <div class="pref-toggle active"></div>
+        </div>
+        <div class="pref-item">
+          <div class="pref-icon">🚲</div>
+          <span>BiZi</span>
+          <div
+            class="pref-toggle"
+            [class.active]="persona.id === 'martin'"
+          ></div>
+        </div>
+        <div class="pref-item">
+          <div class="pref-icon">🛴</div>
+          <span>Scooter</span>
+          <div
+            class="pref-toggle"
+            [class.active]="persona.id === 'martin'"
+          ></div>
+        </div>
+        <div class="pref-item">
+          <div class="pref-icon">🚗</div>
+          <span>Carpool</span>
+          <div class="pref-toggle" [class.active]="persona.id === 'sara'"></div>
+        </div>
+        <div class="pref-item">
+          <div class="pref-icon">🚶</div>
+          <span>Walk</span>
+          <div class="pref-toggle active"></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

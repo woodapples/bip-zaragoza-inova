@@ -1,0 +1,108 @@
+<div class="safety-page">
+  <div class="page-header">
+    <h1 class="page-title">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#00e5ff"
+        stroke-width="2"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+      Safety Rating
+    </h1>
+    <p class="page-subtitle">Interactive community-driven safety assessments</p>
+  </div>
+
+  <div class="safety-grid">
+    <!-- Overall Rating -->
+    <div class="overall-card glass-panel glow-border">
+      <div class="overall-score">
+        <span class="big-rating glow-text">{{ overallRating }}</span>
+        <span class="out-of">/5</span>
+      </div>
+      <div class="overall-stars">
+        @for (star of getStarArray(); track star) {
+          <span class="star-lg" [class.filled]="star <= overallRating">★</span>
+        }
+      </div>
+      <p class="review-count">Based on {{ totalReviews | number }} reviews</p>
+    </div>
+
+    <!-- Rate Now -->
+    <div class="rate-card glass-panel">
+      <h3 class="card-title">Rate Your Experience</h3>
+      <div class="rate-stars">
+        @for (star of getStarArray(); track star) {
+          <span
+            class="rate-star"
+            [class.filled]="star <= (hoverRating || userRating)"
+            (mouseenter)="setHover(star)"
+            (mouseleave)="clearHover()"
+            (click)="setRating(star)"
+          >
+            ★
+          </span>
+        }
+      </div>
+      @if (userRating > 0) {
+        <p class="rate-thanks">Thanks for rating {{ userRating }}/5!</p>
+      } @else {
+        <p class="rate-prompt">Tap a star to rate</p>
+      }
+    </div>
+
+    <!-- Categories -->
+    <div class="categories-card glass-panel">
+      <h3 class="card-title">Safety Categories</h3>
+      <div class="categories-list">
+        @for (cat of categories; track cat.name) {
+          <div class="category-row">
+            <span class="cat-icon">{{ cat.icon }}</span>
+            <span class="cat-name">{{ cat.name }}</span>
+            <div class="cat-bar-wrap">
+              <div class="cat-bar">
+                <div
+                  class="cat-bar-fill"
+                  [style.width.%]="getFilledWidth(cat.rating)"
+                ></div>
+              </div>
+            </div>
+            <span class="cat-rating">{{ cat.rating }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="reviews-card glass-panel">
+      <h3 class="card-title">Recent Reviews</h3>
+      <div class="reviews-list">
+        @for (review of recentReviews; track review.user) {
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-user">
+                <span class="review-avatar">{{ review.user[0] }}</span>
+                <span class="review-name">{{ review.user }}</span>
+                <span class="review-line">{{ review.line }}</span>
+              </div>
+              <div class="review-meta">
+                <div class="review-stars">
+                  @for (star of getStarArray(); track star) {
+                    <span class="star-sm" [class.filled]="star <= review.rating"
+                      >★</span
+                    >
+                  }
+                </div>
+                <span class="review-time">{{ review.time }}</span>
+              </div>
+            </div>
+            <p class="review-text">{{ review.comment }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<nav class="sidebar">
+  <div class="nav-items">
+    @for (item of navItems; track item.icon) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [title]="item.label"
+        (click)="setActive(item.route)"
+      >
+        <div class="icon-wrap" [innerHTML]="item.svg"></div>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </div>
+</nav>

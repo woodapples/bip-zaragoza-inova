@@ -1,0 +1,552 @@
+<div class="tickets-page">
+  <div class="page-header">
+    <h1 class="page-title">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#00e5ff"
+        stroke-width="2"
+      >
+        <path
+          d="M2 9a3 3 0 013-3h14a3 3 0 013 3v0a3 3 0 01-3 3v0a3 3 0 01-3-3v0a3 3 0 013-3v0"
+        />
+        <rect x="2" y="6" width="20" height="12" rx="3" />
+        <path d="M2 12h20M9 6v12" />
+      </svg>
+      AR Ticket Hub
+    </h1>
+    <p class="page-subtitle">Book, view & scan your transit passes</p>
+  </div>
+
+  <!-- View Tabs -->
+  <div class="view-tabs">
+    <button
+      class="view-tab"
+      [class.active]="activeView === 'book'"
+      (click)="activeView = 'book'"
+    >
+      BOOK
+    </button>
+    <button
+      class="view-tab"
+      [class.active]="activeView === 'active'"
+      (click)="activeView = 'active'"
+    >
+      ACTIVE
+      @if (activeTickets.length) {
+        <span class="badge">{{ activeTickets.length }}</span>
+      }
+    </button>
+    <button
+      class="view-tab"
+      [class.active]="activeView === 'history'"
+      (click)="activeView = 'history'"
+    >
+      HISTORY
+    </button>
+  </div>
+
+  <!-- BOOK VIEW -->
+  @if (activeView === "book") {
+    <div class="book-section">
+      <div class="ticket-grid">
+        @for (ticket of ticketTypes; track ticket.id) {
+          <div
+            class="ticket-type-card glass-panel"
+            [class.selected]="selectedTicketType === ticket.id"
+            (click)="selectTicketType(ticket.id)"
+          >
+            <span class="ticket-icon">{{ ticket.icon }}</span>
+            <h4 class="ticket-name">{{ ticket.name }}</h4>
+            <span class="ticket-price">{{ ticket.price }}</span>
+            <span class="ticket-desc">{{ ticket.desc }}</span>
+            <span class="ticket-duration">{{ ticket.duration }}</span>
+            @if (selectedTicketType === ticket.id) {
+              <div class="selected-check">✓</div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Future Booking -->
+      <div class="future-booking glass-panel">
+        <h3>Schedule for Later</h3>
+        <p class="future-hint">Book tickets for a future date and time</p>
+        <div class="booking-fields">
+          <div class="field">
+            <label>Date</label>
+            <input
+              type="date"
+              [(ngModel)]="bookingDate"
+              [min]="getMinDate()"
+              class="ar-input"
+            />
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" [(ngModel)]="bookingTime" class="ar-input" />
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="book-btn btn-primary"
+        [class.disabled]="!selectedTicketType"
+        (click)="bookTicket()"
+      >
+        @if (selectedTicketType) {
+          Book {{ getSelectedTypeName() }}
+        } @else {
+          Select a ticket type
+        }
+      </button>
+    </div>
+  }
+
+  <!-- ACTIVE TICKETS -->
+  @if (activeView === "active") {
+    <div class="active-section">
+      @if (activeTickets.length === 0) {
+        <div class="empty-state glass-panel">
+          <p>No active tickets</p>
+        </div>
+      }
+      @for (ticket of activeTickets; track ticket.id) {
+        <div class="ar-ticket-card glass-panel" (click)="openARPreview(ticket)">
+          <div class="ar-ticket-shimmer"></div>
+          <div class="ar-ticket-content">
+            <div class="ar-ticket-left">
+              <div class="ar-ticket-header">
+                <span class="ar-type">{{ ticket.type }}</span>
+                <span class="ar-line">{{ ticket.line }}</span>
+              </div>
+              <div class="ar-route">
+                <div class="ar-station">
+                  <span class="ar-station-time">{{
+                    ticket.departureTime
+                  }}</span>
+                  <span class="ar-station-name">{{ ticket.departure }}</span>
+                </div>
+                <div class="ar-route-line">
+                  <div class="ar-route-dot start"></div>
+                  <div class="ar-route-track"></div>
+                  <div class="ar-route-dot end"></div>
+                </div>
+                <div class="ar-station">
+                  <span class="ar-station-time">{{ ticket.arrivalTime }}</span>
+                  <span class="ar-station-name">{{ ticket.arrival }}</span>
+                </div>
+              </div>
+              <div class="ar-ticket-footer">
+                <span class="ar-date">{{ ticket.date }}</span>
+                <span class="ar-id">{{ ticket.id }}</span>
+              </div>
+            </div>
+            <div class="ar-ticket-right">
+              <div class="qr-placeholder">
+                <svg viewBox="0 0 100 100" class="qr-svg">
+                  <rect
+                    x="5"
+                    y="5"
+                    width="25"
+                    height="25"
+                    fill="#00e5ff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="35"
+                    y="5"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.6"
+                  />
+                  <rect
+                    x="50"
+                    y="5"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="70"
+                    y="5"
+                    width="25"
+                    height="25"
+                    fill="#00e5ff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="5"
+                    y="35"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.6"
+                  />
+                  <rect
+                    x="25"
+                    y="35"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.4"
+                  />
+                  <rect
+                    x="45"
+                    y="35"
+                    width="15"
+                    height="15"
+                    fill="#00e5ff"
+                    opacity="0.7"
+                  />
+                  <rect
+                    x="65"
+                    y="35"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.5"
+                  />
+                  <rect
+                    x="85"
+                    y="35"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.6"
+                  />
+                  <rect
+                    x="5"
+                    y="55"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.5"
+                  />
+                  <rect
+                    x="20"
+                    y="55"
+                    width="15"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.7"
+                  />
+                  <rect
+                    x="45"
+                    y="55"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.4"
+                  />
+                  <rect
+                    x="60"
+                    y="55"
+                    width="10"
+                    height="15"
+                    fill="#00e5ff"
+                    opacity="0.6"
+                  />
+                  <rect
+                    x="80"
+                    y="55"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="5"
+                    y="70"
+                    width="25"
+                    height="25"
+                    fill="#00e5ff"
+                    opacity="0.8"
+                  />
+                  <rect
+                    x="35"
+                    y="75"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.5"
+                  />
+                  <rect
+                    x="50"
+                    y="70"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.6"
+                  />
+                  <rect
+                    x="70"
+                    y="70"
+                    width="10"
+                    height="10"
+                    fill="#00e5ff"
+                    opacity="0.4"
+                  />
+                  <rect
+                    x="85"
+                    y="80"
+                    width="10"
+                    height="15"
+                    fill="#00e5ff"
+                    opacity="0.7"
+                  />
+                </svg>
+                <div class="qr-scan-line"></div>
+              </div>
+              <span class="qr-code-text">{{ ticket.qrCode }}</span>
+            </div>
+          </div>
+          <div class="ar-hud-corners">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner bl"></span>
+            <span class="corner br"></span>
+          </div>
+          <span class="tap-hint">TAP TO VIEW IN AR</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- HISTORY -->
+  @if (activeView === "history") {
+    <div class="history-section">
+      @for (ticket of historyTickets; track ticket.id) {
+        <div class="history-ticket glass-panel" [class]="ticket.status">
+          <div class="history-info">
+            <span class="history-type">{{ ticket.type }}</span>
+            <span class="history-route"
+              >{{ ticket.departure }} → {{ ticket.arrival }}</span
+            >
+            <span class="history-line"
+              >{{ ticket.line }} · {{ ticket.date }}</span
+            >
+          </div>
+          <div class="history-status">
+            <span class="status-badge" [class]="ticket.status">{{
+              ticket.status | uppercase
+            }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Confirmation Toast -->
+  @if (showConfirmation) {
+    <div class="confirmation-toast">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#00e676">
+        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+      </svg>
+      Ticket booked successfully!
+    </div>
+  }
+
+  <!-- AR Preview Overlay -->
+  @if (showARPreview && arTicket) {
+    <div class="ar-overlay" (click)="closeARPreview()">
+      <div class="ar-hud">
+        <div class="ar-hud-header">
+          <span class="ar-hud-label">AR TICKET VIEWER</span>
+          <span class="ar-hud-status">● SCANNING</span>
+        </div>
+        <div class="ar-fullscreen-ticket" (click)="$event.stopPropagation()">
+          <div class="ar-big-qr">
+            <svg viewBox="0 0 100 100" class="qr-svg big">
+              <rect
+                x="5"
+                y="5"
+                width="25"
+                height="25"
+                fill="#00e5ff"
+                opacity="0.9"
+              />
+              <rect
+                x="35"
+                y="5"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.7"
+              />
+              <rect
+                x="50"
+                y="5"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.9"
+              />
+              <rect
+                x="70"
+                y="5"
+                width="25"
+                height="25"
+                fill="#00e5ff"
+                opacity="0.9"
+              />
+              <rect
+                x="5"
+                y="35"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.7"
+              />
+              <rect
+                x="25"
+                y="35"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.5"
+              />
+              <rect
+                x="45"
+                y="35"
+                width="15"
+                height="15"
+                fill="#00e5ff"
+                opacity="0.8"
+              />
+              <rect
+                x="65"
+                y="35"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.6"
+              />
+              <rect
+                x="85"
+                y="35"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.7"
+              />
+              <rect
+                x="5"
+                y="55"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.6"
+              />
+              <rect
+                x="20"
+                y="55"
+                width="15"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.8"
+              />
+              <rect
+                x="45"
+                y="55"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.5"
+              />
+              <rect
+                x="60"
+                y="55"
+                width="10"
+                height="15"
+                fill="#00e5ff"
+                opacity="0.7"
+              />
+              <rect
+                x="80"
+                y="55"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.9"
+              />
+              <rect
+                x="5"
+                y="70"
+                width="25"
+                height="25"
+                fill="#00e5ff"
+                opacity="0.9"
+              />
+              <rect
+                x="35"
+                y="75"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.6"
+              />
+              <rect
+                x="50"
+                y="70"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.7"
+              />
+              <rect
+                x="70"
+                y="70"
+                width="10"
+                height="10"
+                fill="#00e5ff"
+                opacity="0.5"
+              />
+              <rect
+                x="85"
+                y="80"
+                width="10"
+                height="15"
+                fill="#00e5ff"
+                opacity="0.8"
+              />
+            </svg>
+            <div class="qr-scan-line big"></div>
+          </div>
+          <h2 class="ar-ticket-name">{{ arTicket.type }}</h2>
+          <div class="ar-ticket-details">
+            <div class="ar-detail-row">
+              <span class="ar-label">FROM</span>
+              <span class="ar-val">{{ arTicket.departure }}</span>
+            </div>
+            <div class="ar-detail-row">
+              <span class="ar-label">TO</span>
+              <span class="ar-val">{{ arTicket.arrival }}</span>
+            </div>
+            <div class="ar-detail-row">
+              <span class="ar-label">LINE</span>
+              <span class="ar-val">{{ arTicket.line }}</span>
+            </div>
+            <div class="ar-detail-row">
+              <span class="ar-label">DATE</span>
+              <span class="ar-val">{{ arTicket.date }}</span>
+            </div>
+            <div class="ar-detail-row">
+              <span class="ar-label">TIME</span>
+              <span class="ar-val">{{ arTicket.departureTime }}</span>
+            </div>
+          </div>
+          <span class="ar-qr-id">{{ arTicket.qrCode }}</span>
+        </div>
+        <div class="ar-hud-footer">
+          <span>Hold device steady to scan</span>
+          <button class="ar-close-btn" (click)="closeARPreview()">CLOSE</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
